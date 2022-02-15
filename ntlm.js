@@ -8,7 +8,6 @@
 
 var CryptoJS = require('crypto-js');
 var md4 = require('js-md4');
-var md5 = require('js-md5');
 
 var flags = {
 	NTLM_NegotiateUnicode                :  0x00000001,
@@ -412,9 +411,7 @@ function ntlm2sr_calc_resp(responseKeyNT, serverChallenge, clientChallenge){
     clientChallenge.copy(lmChallengeResponse, 0, 0, clientChallenge.length);
 
 	var buf = Buffer.concat([serverChallenge, clientChallenge]);
-	var hash = md5.create();
-	hash.update(buf);
-	var sess = Buffer.from(hash.hex(), 'hex');
+	var sess = Buffer.from(CryptoJS.MD5(CryptoJS.enc.Hex.parse(buf.toString('hex'))).toString(), 'hex');
 	var ntChallengeResponse = calc_resp(responseKeyNT, sess.slice(0,8));
 
     return {
