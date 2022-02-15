@@ -7,6 +7,7 @@
  */
 
 var crypto = require('crypto');
+var CryptoJS = require('crypto-js');
 
 var flags = {
 	NTLM_NegotiateUnicode                :  0x00000001,
@@ -262,8 +263,11 @@ function create_LM_hashed_password_v1(password){
 
 	function encrypt(buf){
 		var key = insertZerosEvery7Bits(buf);
-		var des = crypto.createCipheriv('DES-ECB', key, '');
-		return des.update("KGS!@#$%"); // page 57 in [MS-NLMP]);
+		var encrypted = CryptoJS.DES.encrypt("KGS!@#$%", key.toString(), {
+			mode: CryptoJS.mode.ECB
+		}); // page 57 in [MS-NLMP]);
+
+		return Buffer.from(encrypted.toString(), 'utf-8');
 	}
 
 	var firstPartEncrypted = encrypt(firstPart);
@@ -360,23 +364,44 @@ function create_NT_hashed_password_v1(password){
 }
 
 function calc_resp(password_hash, server_challenge){
-    // padding with zeros to make the hash 21 bytes long
-    var passHashPadded = new Buffer(21);
-    passHashPadded.fill("\0");
-    password_hash.copy(passHashPadded, 0, 0, password_hash.length);
+	// padding with zeros to make the hash 21 bytes long
+	var passHashPadded = new Buffer(21);
+	passHashPadded.fill("\0");
+	password_hash.copy(passHashPadded, 0, 0, password_hash.length);
 
-    var resArray = [];
+	var resArray = [];
 
-    var des = crypto.createCipheriv('DES-ECB', insertZerosEvery7Bits(passHashPadded.slice(0,7)), '');
-    resArray.push( des.update(server_challenge.slice(0,8)) );
+	var key1 = insertZerosEvery7Bits(passHashPadded.slice(0,7));
+	var challenge1 = server_challenge.slice(0,8);
+	var encrypted1 = CryptoJS.DES.encrypt(CryptoJS.enc.Hex.parse(challenge1.toString('hex')), CryptoJS.enc.Hex.parse(key1.toString('hex')), {
+		mode: CryptoJS.mode.ECB,
+		padding: CryptoJS.pad.NoPadding,
+		iv: ''
+	});
 
-    des = crypto.createCipheriv('DES-ECB', insertZerosEvery7Bits(passHashPadded.slice(7,14)), '');
-    resArray.push( des.update(server_challenge.slice(0,8)) );
+	resArray.push(Buffer.from(encrypted1.toString(), 'base64'));
 
-    des = crypto.createCipheriv('DES-ECB', insertZerosEvery7Bits(passHashPadded.slice(14,21)), '');
-    resArray.push( des.update(server_challenge.slice(0,8)) );
+	var key2 = insertZerosEvery7Bits(passHashPadded.slice(7,14));
+	var challenge2 = server_challenge.slice(0,8);
+	var encrypted2 = CryptoJS.DES.encrypt(CryptoJS.enc.Hex.parse(challenge2.toString('hex')), CryptoJS.enc.Hex.parse(key2.toString('hex')), {
+		mode: CryptoJS.mode.ECB,
+		padding: CryptoJS.pad.NoPadding,
+		iv: ''
+	});
 
-   	return Buffer.concat(resArray);
+	resArray.push(Buffer.from(encrypted2.toString(), 'base64'));
+
+	var key3 = insertZerosEvery7Bits(passHashPadded.slice(14,21));
+	var challenge3 = server_challenge.slice(0,8);
+	var encrypted3 = CryptoJS.DES.encrypt(CryptoJS.enc.Hex.parse(challenge3.toString('hex')), CryptoJS.enc.Hex.parse(key3.toString('hex')), {
+		mode: CryptoJS.mode.ECB,
+		padding: CryptoJS.pad.NoPadding,
+		iv: ''
+	});
+
+	resArray.push(Buffer.from(encrypted3.toString(), 'base64'))
+
+	return Buffer.concat(resArray);
 }
 
 function ntlm2sr_calc_resp(responseKeyNT, serverChallenge, clientChallenge){
