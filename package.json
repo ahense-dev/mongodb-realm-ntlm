@@ -1,11 +1,12 @@
 {
   "name": "mongodb-realm-ntlm",
   "description": "mongodb-realm-ntlm is a Node.js library to do HTTP NTLM authentication, adapted for MongoDB Realm applications",
-  "version": "1.7.7-2",
+  "version": "1.7.7-3",
   "dependencies": {
     "crypto-js": "^3.1.9-1",
     "httpreq": ">=0.4.22",
     "js-md4": "^0.3.2",
+    "md5": "^2.3.0",
     "underscore": "~1.12.1"
   },
   "author": {

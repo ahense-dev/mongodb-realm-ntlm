@@ -6,9 +6,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-var crypto = require('crypto');
 var CryptoJS = require('crypto-js');
 var md4 = require('js-md4');
+var md5 = require('md5');
 
 var flags = {
 	NTLM_NegotiateUnicode                :  0x00000001,
@@ -411,11 +411,10 @@ function ntlm2sr_calc_resp(responseKeyNT, serverChallenge, clientChallenge){
     lmChallengeResponse.fill("\0");
     clientChallenge.copy(lmChallengeResponse, 0, 0, clientChallenge.length);
 
-    var buf = Buffer.concat([serverChallenge, clientChallenge]);
-    var md5 = crypto.createHash('md5');
-    md5.update(buf);
-    var sess = md5.digest();
-    var ntChallengeResponse = calc_resp(responseKeyNT, sess.slice(0,8));
+	var buf = Buffer.concat([serverChallenge, clientChallenge]);
+	var hash = md5(buf);
+	var sess = Buffer.from(hash, 'hex');
+	var ntChallengeResponse = calc_resp(responseKeyNT, sess.slice(0,8));
 
     return {
     	lmChallengeResponse: lmChallengeResponse,
