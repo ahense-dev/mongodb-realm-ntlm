@@ -8,6 +8,7 @@
 
 var crypto = require('crypto');
 var CryptoJS = require('crypto-js');
+var md4 = require('js-md4');
 
 var flags = {
 	NTLM_NegotiateUnicode                :  0x00000001,
@@ -358,9 +359,9 @@ function binaryArray2bytes(array){
 
 function create_NT_hashed_password_v1(password){
 	var buf = new Buffer(password, 'utf16le');
-	var md4 = crypto.createHash('md4');
-	md4.update(buf);
-	return new Buffer(md4.digest());
+	var hash = md4.create();
+	hash.update(buf)
+	return Buffer.from(hash.hex(), 'hex');
 }
 
 function calc_resp(password_hash, server_challenge){
