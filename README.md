@@ -1,23 +1,25 @@
-# httpntlm
+# mongodb-realm-ntlm
 
-__httpntlm__ is a Node.js library to do HTTP NTLM authentication
+__mongodb-realm-ntlm__ is a Node.js library to do HTTP NTLM authentication, adapted for MongoDB Realm applications
+
+This is a fork of SamDecrock's [httpntlm](https://github.com/SamDecrock/node-http-ntlm)
 
 It's a port from the Python libary [python-ntml](https://code.google.com/p/python-ntlm/)
 
 ## Donate
 
-If you depend on this module, feel free [to buy me a pizza 🍕](https://www.buymeacoffee.com/samdecrock)
+If you depend on this module, feel free [to buy SamDecrock a pizza 🍕](https://www.buymeacoffee.com/samdecrock)
 
 ## Install
 
-You can install __httpntlm__ using the Node Package Manager (npm):
+You can install __mongodb-realm-ntlm__ using the Node Package Manager (npm):
 
-    npm install httpntlm
+    npm install mongodb-realm-ntlm
 
 ## How to use
 
 ```js
-var httpntlm = require('httpntlm');
+var httpntlm = require('mongodb-realm-ntlm');
 
 httpntlm.get({
     url: "https://someurl.com",
@@ -38,7 +40,7 @@ It supports __http__ and __https__.
 ## pre-encrypt the password
 ```js
 
-var httpntlm = require('httpntlm');
+var httpntlm = require('mongodb-realm-ntlm');
 var ntlm = httpntlm.ntlm;
 var lm = ntlm.create_LM_hashed_password('Azx123456');
 var nt = ntlm.create_NT_hashed_password('Azx123456');
@@ -186,6 +188,7 @@ httpntlm.get({
 ## License (MIT)
 
 Copyright (c) Sam Decrock <https://github.com/SamDecrock/>
+Copyright (c) Alexander Hense <https://github.com/ahense-dev/>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
