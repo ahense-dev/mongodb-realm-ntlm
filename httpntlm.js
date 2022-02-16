@@ -66,11 +66,11 @@ exports.method = function(method, options, finalCallback){
 		}
 
 
-		if(!res.headers['www-authenticate'])
+		if(!res.headers['Www-Authenticate'])
 			return callback(new Error('www-authenticate not found on response of second request'));
 
 		// parse type2 message from server:
-		var type2msg = ntlm.parseType2Message(res.headers['www-authenticate'], callback); //callback only happens on errors
+		var type2msg = ntlm.parseType2Message(res.headers['Www-Authenticate'], callback); //callback only happens on errors
 		if(!type2msg) return; // if callback returned an error, the parse-function returns with null
 
 		// create type3 message:
